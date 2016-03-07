@@ -20,7 +20,14 @@ end
 
 local cjson = require "cjson"
 
-local args = ngx.req.get_uri_args()
+local args
+
+if (ngx.var.request_method == "POST") then
+   args = ngx.req.get_post_args()
+else
+   args = ngx.req.get_uri_args()
+end
+
 
 local returnResult = {errorCode="00", errorMessage="", returnObject=""}
 
