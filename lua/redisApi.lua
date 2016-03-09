@@ -31,6 +31,17 @@ end
 
 local returnResult = {errorCode="00", errorMessage="", returnObject=""}
 
+-- parameter checking
+
+if not args.cmd then
+   returnResult["errorCode"] = "04"
+   returnResult["errorMessage"] = "No cmd parameter."
+   ngx.say(cjson.encode(returnResult))
+   return
+end
+
+-- end of parameter checking
+
 local res, err
 
 local args_length = 0
@@ -56,7 +67,7 @@ if (args_length == 5) then
 end
 
 if not res then
-	returnResult["errorCode"] = "01"
+	returnResult["errorCode"] = "02"
 	if not err then
 		returnResult["errorMessage"] = "Some errors occured!"
 	else
@@ -76,7 +87,7 @@ ngx.say(cjson.encode(returnResult))
 local ok, err = red:set_keepalive(10000, 100)
 if not ok then
    -- ngx.say("failed to set keepalive: ", err)
-	returnResult["errorCode"] = "02"
+	returnResult["errorCode"] = "03"
 	returnResult["errorMessage"] = "failed to set keepalive: " .. err
    return
 end
