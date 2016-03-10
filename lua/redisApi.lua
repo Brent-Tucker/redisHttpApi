@@ -23,6 +23,7 @@ local cjson = require "cjson"
 local args
 
 if (ngx.var.request_method == "POST") then
+	ngx.req.read_body()
    args = ngx.req.get_post_args()
 else
    args = ngx.req.get_uri_args()
