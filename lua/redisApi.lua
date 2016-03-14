@@ -31,20 +31,47 @@ local returnResult = {errorCode="00", errorMessage="", returnObject=""}
 
 -- parameter checking
 
-if not args.cmd then
-   returnResult["errorCode"] = "04"
-   returnResult["errorMessage"] = "No cmd parameter."
-   ngx.say(cjson.encode(returnResult))
-   return
+if args.mode == "BATCH" then
+	if not args.cmds then
+   	returnResult["errorCode"] = "05"
+   	returnResult["errorMessage"] = "No cmds parameter when in batch mode."
+   	ngx.say(cjson.encode(returnResult))
+   	return
+	end
+else
+	if not args.cmd then
+		returnResult["errorCode"] = "04"
+		returnResult["errorMessage"] = "No cmd parameter."
+		ngx.say(cjson.encode(returnResult))
+		return
+	end
 end
+
 
 -- end of parameter checking
 
 local res, err
 
-local args_length = 0
+if args.mode == "BATCH" then
+	local cmds = cjson.decode(args.cmds)
 
-res, err = utils:eval("red:" .. args.cmd)
+	if not cmds then
+   	returnResult["errorCode"] = "06"
+   	returnResult["errorMessage"] = "cmds parameter is not in JSON format."
+   	ngx.say(cjson.encode(returnResult))
+   	return
+	end
+
+	res, err = red:init_pipeline()
+
+	for _, command in ipairs(cmds) do
+		res, err = utils:eval("red:" .. command)
+	end
+
+	res, err = red:commit_pipeline()	
+else
+	res, err = utils:eval("red:" .. args.cmd)
+end
 
 if not res then
 	returnResult["errorCode"] = "02"
@@ -53,9 +80,10 @@ if not res then
 	else
 		returnResult["errorMessage"] = "Some errors occured: " .. err
 	end
-   ngx.say(cjson.encode(returnResult))
-   return
+	ngx.say(cjson.encode(returnResult))
+	return
 end
+
 
 returnResult["errorCode"] = "00"
 returnResult["returnObject"] = res
