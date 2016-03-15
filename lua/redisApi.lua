@@ -1,11 +1,15 @@
 local redis = require "lua.lib.redis"
-local utils = (require "lua.lib.utils"):new()
+local utils = require "lua.lib.utils"
 
 red = redis:new()
 
 local config = require("lua.appConfig")
 
 red:set_timeout(1000) -- 1 sec
+
+local cjson = require "cjson"
+
+local returnResult = {errorCode="00", errorMessage="", returnObject=""}
 
 local ok, err = red:connect(config["redis_host"], config["redis_port"])
 if not ok then
@@ -15,8 +19,6 @@ if not ok then
    return
 end
 
-local cjson = require "cjson"
-
 local args
 
 if (ngx.var.request_method == "POST") then
@@ -25,9 +27,6 @@ if (ngx.var.request_method == "POST") then
 else
    args = ngx.req.get_uri_args()
 end
-
-
-local returnResult = {errorCode="00", errorMessage="", returnObject=""}
 
 -- parameter checking
 
@@ -65,12 +64,12 @@ if args.mode == "BATCH" then
 	res, err = red:init_pipeline()
 
 	for _, command in ipairs(cmds) do
-		res, err = utils:eval("red:" .. command)
+		res, err = utils.eval("red:" .. command)
 	end
 
 	res, err = red:commit_pipeline()	
 else
-	res, err = utils:eval("red:" .. args.cmd)
+	res, err = utils.eval("red:" .. args.cmd)
 end
 
 if not res then
