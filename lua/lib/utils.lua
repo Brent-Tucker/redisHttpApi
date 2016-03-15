@@ -1,11 +1,11 @@
 local utils = { }
 
-function utils.eval(self, expr)
+function utils.eval(expr)
    local f = load('return ' .. expr)
    return f()
 end
 
-function utils.getReturnResult(self, errorCode, errorMessage, returnObject)
+function utils.getReturnResult(errorCode, errorMessage, returnObject)
 	local returnResult = { errorCode = errorCode }
 	if errorMessage then
 		returnResult["errorMessage"] = errorMessage
@@ -18,14 +18,14 @@ function utils.getReturnResult(self, errorCode, errorMessage, returnObject)
 	return returnResult
 end
 
-function utils.handleRedisReturns(self, res, err, errorCode)
+function utils.handleRedisReturns(res, err, errorCode)
 	local returnResult
 
    if not res then
       if not err then
-         returnResult = self:getReturnResult(errorCode,"Some errors occured when operating Redis!")
+         returnResult = utils.getReturnResult(errorCode,"Some errors occured when operating Redis!")
       else
-         returnResult = self:getReturnResult(errorCode,"Some errors occured when operating Redis : " .. err)
+         returnResult = utils.getReturnResult(errorCode,"Some errors occured when operating Redis : " .. err)
       end
       return
    end
