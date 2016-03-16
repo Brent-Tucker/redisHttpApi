@@ -1,9 +1,9 @@
-local redis = require "lua.lib.redis"
-local utils = require "lua.lib.utils"
+local redis = require "lib.redis"
+local utils = require "lib.utils"
 
 red = redis:new()
 
-local config = require("lua.appConfig")
+local config = require("appConfig")
 
 red:set_timeout(1000) -- 1 sec
 
@@ -63,7 +63,6 @@ else
 end
 
 if not res then
-	returnResult["errorCode"] = "02"
 	if not err then
 		ngx.say(cjson.encode(utils.getReturnResult("02","Some errors occured!")))
 	else
