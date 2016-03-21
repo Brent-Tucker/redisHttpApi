@@ -1,4 +1,4 @@
-# restHttpApi
+# redisHttpApi
 
 ## Requirements:
 
