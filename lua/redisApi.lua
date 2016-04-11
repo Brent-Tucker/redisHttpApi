@@ -15,6 +15,15 @@ if not ok then
    return
 end
 
+-- check if needs authentication
+if config["redis_require_auth"] == 'Y' then
+	ok,err = red:auth(config["redis_auth_pass"])
+	if not ok then
+		ngx.say(cjson.encode(utils.getReturnResult("07","Failed to authenticate: " .. err )))
+		return
+	end
+end
+
 local args
 
 if (ngx.var.request_method == "POST") then
@@ -57,7 +66,7 @@ if args.mode == "BATCH" then
 		res, err = utils.eval("red:" .. command)
 	end
 
-	res, err = red:commit_pipeline()	
+	res, err = red:commit_pipeline()
 else
 	res, err = utils.eval("red:" .. args.cmd)
 end
@@ -80,4 +89,3 @@ if not ok then
 	ngx.say(cjson.encode(utils.getReturnResult("03","Failed to set keepalive: " .. err)))
    return
 end
-
