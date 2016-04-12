@@ -26,7 +26,7 @@ local httpt = require "resty.http"
 local httpc = httpt.new()
 local res, err = httpc:request_uri(config["acl_check_url"], {
   method = "POST",
-  body = "access_token=" .. args.access_token .. "&api_url=" .. ngx.var.request_uri,
+  body = "access_token=" .. args.access_token .. "&api_url=" .. ngx.var.uri,
   headers = {
     ["Content-Type"] = "application/x-www-form-urlencoded",
   }
